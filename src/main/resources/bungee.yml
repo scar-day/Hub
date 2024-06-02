@@ -1,0 +1,4 @@
+name: BungeeHub
+version: '${version}'
+main: dev.scarday.Main
+author: ScarDay
