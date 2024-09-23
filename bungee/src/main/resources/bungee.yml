@@ -1,4 +1,4 @@
-name: BungeeHub
-version: '${version}'
+name: '@NAME@'
+version: '@VERSION@'
 main: dev.scarday.Main
 author: ScarDay

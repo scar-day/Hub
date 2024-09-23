@@ -1,7 +1,0 @@
-server: "hub"
-
-messages:
-  connect: "&aПодключаю вас в хаб"
-  connected: "&cВы итак в этом хабе!"
-  console-message: "don't usage command console"
-  no-found-server: "&cПохоже что данного сервера нету в списке, сообщите администрации!"
