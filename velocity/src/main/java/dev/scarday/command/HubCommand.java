@@ -1,8 +1,6 @@
 package dev.scarday.command;
 
-import com.mojang.brigadier.tree.CommandNode;
 import com.velocitypowered.api.command.CommandMeta;
-import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.RawCommand;
 import com.velocitypowered.api.proxy.Player;
 import dev.scarday.Main;
