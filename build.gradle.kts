@@ -52,14 +52,4 @@ subprojects {
             }
         }
     } // я не знаю почему, но при сборке velocity не складывается файл velocity-plugin.json
-
-    tasks.register("cleanBuildDir") {
-        doLast {
-            delete(buildDir)
-        }
-    }
-
-    tasks.named("build").configure {
-        finalizedBy("cleanBuildDir")
-    }
 }
