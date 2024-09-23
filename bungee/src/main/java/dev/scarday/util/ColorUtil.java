@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class ColorUtil {
     private static final Pattern HEX_PATTERN = Pattern.compile("#([a-fA-F\\d]{6})");
-    private static final char COLOR_CHAR = '\u00a7';
+    private static final char COLOR_CHAR = '§';
 
     public static String colorize(@NotNull String message) {
         Matcher matcher = HEX_PATTERN.matcher(message);
