@@ -19,40 +19,40 @@ public class HubCommand extends Command {
 
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
-        if ((commandSender instanceof ProxiedPlayer p)) {
-            val server = instance.getConfig().getServer();
-            val servers = instance.getProxy()
-                    .getServersCopy()
-                    .keySet();
-
-            if (!servers.contains(server)) {
-                String no_found = instance
-                        .getConfig()
-                                .getMessages().getNoFoundServer();
-
-                commandSender.sendMessage(new TextComponent(ColorUtil.colorize(no_found)));
-                return;
-            }
-
-            val serverInfo = instance.getProxy()
-                    .getServerInfo(server);
-
-            val connected = instance.getConfig()
-                    .getMessages().getConnected();
-
-            if (p.getServer().getInfo() == serverInfo) {
-                commandSender.sendMessage(new TextComponent(ColorUtil.colorize(connected)));
-                return;
-            }
-
-            val successfully = instance.getConfig()
-                    .getMessages().getConnect();
-
-            p.sendMessage(new TextComponent(ColorUtil.colorize(successfully)));
-            p.connect(serverInfo);
-        } else {
+        if (!(commandSender instanceof ProxiedPlayer player)) {
             instance.getSLF4JLogger()
                     .info("Command is available only to the player!");
+            return;
         }
+
+        val server = instance.getConfig()
+                .getServer();
+
+        val servers = instance.getProxy()
+                .getServersCopy()
+                .keySet();
+
+        if (!servers.contains(server)) {
+            val noFound = instance.getConfig()
+                    .getMessages().getNoFoundServer();
+
+            commandSender.sendMessage(new TextComponent(ColorUtil.colorize(noFound)));
+            return;
+        }
+
+        val serverInfo = instance.getProxy()
+                .getServerInfo(server);
+
+        val connected = instance.getConfig()
+                .getMessages().getConnected();
+
+        if (player.getServer().getInfo() == serverInfo) {
+            commandSender.sendMessage(new TextComponent(ColorUtil.colorize(connected)));
+            return;
+        }
+
+        player.sendMessage(new TextComponent(ColorUtil.colorize(
+                instance.getConfig().getMessages().getConnect())));
+        player.connect(serverInfo);
     }
 }
