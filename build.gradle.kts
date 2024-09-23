@@ -37,7 +37,7 @@ subprojects {
         include("**/*.zip")
         filter<org.apache.tools.ant.filters.ReplaceTokens>(
             "tokens" to mapOf(
-                "ID" to rootProject.name.toLowerCase(),
+                "ID" to rootProject.name.lowercase(),
                 "NAME" to rootProject.name,
                 "VERSION" to rootProject.version,
                 "AUTHOR" to "ScarDay"
