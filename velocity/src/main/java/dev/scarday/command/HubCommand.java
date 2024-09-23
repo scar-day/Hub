@@ -26,50 +26,52 @@ public class HubCommand implements RawCommand {
     public void execute(Invocation invocation) {
         val source = invocation.source();
 
-        if (source instanceof Player player) {
-            instance.getServer().getPlayer(player.getUsername());
-
-            val optionalServer = instance.getServer()
-                    .getServer(instance.getConfig()
-                            .getServer());
-
-            if (optionalServer.isEmpty()) {
-                player.sendMessage(Component.text(instance.getConfig()
-                        .getMessages()
-                        .getNoFoundServer())
-                );
-                return;
-            }
-
-            val server = optionalServer.get();
-
-            val userServer = player.getCurrentServer();
-
-            if (userServer.isPresent()) {
-                val serverFind = server.getServerInfo();
-
-                val userServerInfo = userServer.get()
-                        .getServerInfo();
-
-                if (userServerInfo == serverFind) {
-                    player.sendMessage(Component.text(instance.getConfig()
-                            .getMessages()
-                            .getConnected())
-                    );
-                    return;
-                }
-
-                if (instance.getConfig().getMessages().isSendMessage()) {
-                    player.sendMessage(Component.text(instance.getConfig()
-                            .getMessages()
-                            .getConnect())
-                    );
-                    player.createConnectionRequest(server);
-                }
-            }
-        } else {
+        if (!(source instanceof Player player)) {
             instance.getLogger().info("Command is available only to the player!");
+            return;
         }
+
+        val optionalServer = instance.getServer()
+                .getServer(instance.getConfig()
+                        .getServer()
+                );
+
+        if (optionalServer.isEmpty()) {
+            player.sendMessage(Component.text(instance.getConfig()
+                    .getMessages()
+                    .getNoFoundServer())
+            );
+            return;
+        }
+
+        val server = optionalServer.get();
+
+        val userServer = player.getCurrentServer();
+
+        if (userServer.isEmpty()) {
+            return;
+        }
+
+        val serverFind = server.getServerInfo();
+
+        val userServerInfo = userServer.get()
+                .getServerInfo();
+
+        if (userServerInfo == serverFind) {
+            player.sendMessage(Component.text(
+                    instance.getConfig().getMessages().getConnected()
+            ));
+            return;
+        }
+
+        if (!instance.getConfig().getMessages().isSendMessage()) {
+            return;
+        }
+        player.sendMessage(Component.text(
+                instance.getConfig().getMessages()
+                        .getConnected()
+        ));
+        player.createConnectionRequest(server);
     }
 
 
