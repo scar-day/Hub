@@ -64,13 +64,13 @@ public class HubCommand implements RawCommand {
             return;
         }
 
-        if (!instance.getConfig().getMessages().isSendMessage()) {
-            return;
+        if (instance.getConfig().getMessages().isSendMessage()) {
+            player.sendMessage(Component.text(
+                    instance.getConfig().getMessages()
+                            .getConnected()
+            ));
         }
-        player.sendMessage(Component.text(
-                instance.getConfig().getMessages()
-                        .getConnected()
-        ));
+
         player.createConnectionRequest(server);
     }
 
