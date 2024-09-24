@@ -39,7 +39,7 @@ subprojects {
 
         if (project.name == "common") {
             enabled = false
-        } // костыль но ладно..
+        }
     }
 
     tasks.withType<ProcessResources> {
