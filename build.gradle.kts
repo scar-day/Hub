@@ -37,7 +37,7 @@ subprojects {
         archiveFileName.set("Hub-${project.name}.jar")
         destinationDirectory.set(file("${rootProject.projectDir}/compile"))
 
-        if (project.name == "configuration") {
+        if (project.name == "common") {
             enabled = false
         } // костыль но ладно..
     }
