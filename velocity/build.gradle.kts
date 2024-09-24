@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":configuration"))
+    implementation(project(":common"))
 
     implementation("eu.okaeri:okaeri-platform-velocity:0.4.39")
 
