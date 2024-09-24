@@ -5,5 +5,5 @@ pluginManagement {
 }
 rootProject.name = "Hub"
 
-include("bungee")
-include("velocity")
+include("bungee", "velocity")
+include("configuration")

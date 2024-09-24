@@ -16,10 +16,17 @@ subprojects {
 
     repositories {
         mavenCentral()
+
+        maven { url = uri("https://repo.velocitypowered.com/snapshots/") }
+        maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
+        maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+        maven { url = uri("https://storehouse.okaeri.eu/repository/maven-public/") }
     }
 
     dependencies {
         compileOnly("org.jetbrains:annotations:24.1.0")
+
+        implementation("eu.okaeri:okaeri-configs-core:5.0.5")
 
         compileOnly("org.projectlombok:lombok:1.18.34")
         annotationProcessor("org.projectlombok:lombok:1.18.34")
@@ -29,6 +36,10 @@ subprojects {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         archiveFileName.set("Hub-${project.name}.jar")
         destinationDirectory.set(file("${rootProject.projectDir}/compile"))
+
+        if (project.name == "configuration") {
+            enabled = false
+        } // костыль но ладно..
     }
 
     tasks.withType<ProcessResources> {
@@ -51,5 +62,5 @@ subprojects {
                 include("velocity-plugin.json")
             }
         }
-    } // я не знаю почему, но при сборке velocity не складывается файл velocity-plugin.json
+    }
 }

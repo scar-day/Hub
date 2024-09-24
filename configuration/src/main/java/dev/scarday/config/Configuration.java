@@ -1,10 +1,10 @@
-package dev.scarday.configuration;
+package dev.scarday.config;
 
 import eu.okaeri.configs.OkaeriConfig;
 import lombok.Getter;
 
 @Getter
-public class Config extends OkaeriConfig {
+public class Configuration extends OkaeriConfig {
     private String server = "hub";
 
     private Messages messages = new Messages();

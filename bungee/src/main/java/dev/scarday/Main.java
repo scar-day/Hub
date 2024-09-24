@@ -1,7 +1,7 @@
 package dev.scarday;
 
 import dev.scarday.command.HubCommand;
-import dev.scarday.configuration.Config;
+import dev.scarday.config.Configuration;
 import eu.okaeri.configs.ConfigManager;
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBungee;
 import eu.okaeri.configs.yaml.bungee.YamlBungeeConfigurer;
@@ -16,7 +16,7 @@ import java.io.File;
 public final class Main extends Plugin {
     private Main instance;
 
-    private Config config;
+    private Configuration config;
 
     @Override
     public void onEnable() {
@@ -27,7 +27,7 @@ public final class Main extends Plugin {
     }
 
     public void loadConfig() {
-        this.config = ConfigManager.create(Config.class, (it) -> {
+        this.config = ConfigManager.create(Configuration.class, (it) -> {
             it.withConfigurer(new YamlBungeeConfigurer(), new SerdesBungee());
             it.withBindFile(new File(getDataFolder(), "config.yml"));
             it.saveDefaults();
