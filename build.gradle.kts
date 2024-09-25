@@ -36,7 +36,6 @@ subprojects {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
         val commitId = System.getenv("COMMITID");
-
         val buildName = if (commitId != null) "Hub-${project.name}($commitId).jar" else "Hub-${project.name}-${rootProject.version}.jar"
 
         archiveFileName.set(buildName)
