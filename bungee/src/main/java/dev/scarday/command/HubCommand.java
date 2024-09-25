@@ -1,12 +1,13 @@
 package dev.scarday.command;
 
 import dev.scarday.Main;
-import dev.scarday.util.ColorUtil;
 import lombok.val;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+
+import static dev.scarday.util.ColorUtil.colorize;
 
 public class HubCommand extends Command {
     Main instance;
@@ -36,7 +37,7 @@ public class HubCommand extends Command {
             val noFound = instance.getConfig()
                     .getMessages().getNoFoundServer();
 
-            commandSender.sendMessage(new TextComponent(ColorUtil.colorize(noFound)));
+            commandSender.sendMessage(new TextComponent(colorize(noFound)));
             return;
         }
 
@@ -47,11 +48,11 @@ public class HubCommand extends Command {
                 .getMessages().getConnected();
 
         if (player.getServer().getInfo() == serverInfo) {
-            commandSender.sendMessage(new TextComponent(ColorUtil.colorize(connected)));
+            commandSender.sendMessage(new TextComponent(colorize(connected)));
             return;
         }
 
-        player.sendMessage(new TextComponent(ColorUtil.colorize(
+        player.sendMessage(new TextComponent(colorize(
                 instance.getConfig().getMessages().getConnect())));
         player.connect(serverInfo);
     }

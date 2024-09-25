@@ -7,6 +7,8 @@ import dev.scarday.Main;
 import lombok.val;
 import net.kyori.adventure.text.Component;
 
+import static dev.scarday.util.ColorUtil.colorize;
+
 public class HubCommand implements RawCommand {
     Main instance;
     public HubCommand(Main instance) {
@@ -37,10 +39,9 @@ public class HubCommand implements RawCommand {
                 );
 
         if (optionalServer.isEmpty()) {
-            player.sendMessage(Component.text(instance.getConfig()
-                    .getMessages()
-                    .getNoFoundServer())
-            );
+            player.sendMessage(Component.text(colorize(
+                    instance.getConfig().getMessages().getNoFoundServer()
+            )));
             return;
         }
 
@@ -58,17 +59,17 @@ public class HubCommand implements RawCommand {
                 .getServerInfo();
 
         if (userServerInfo == serverFind) {
-            player.sendMessage(Component.text(
+            player.sendMessage(Component.text(colorize(
                     instance.getConfig().getMessages().getConnected()
-            ));
+            )));
             return;
         }
 
         if (instance.getConfig().getMessages().isSendMessage()) {
-            player.sendMessage(Component.text(
+            player.sendMessage(Component.text(colorize(
                     instance.getConfig().getMessages()
                             .getConnected()
-            ));
+            )));
         }
 
         player.createConnectionRequest(server);

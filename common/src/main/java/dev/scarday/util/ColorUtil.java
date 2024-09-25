@@ -1,6 +1,5 @@
 package dev.scarday.util;
 
-import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
@@ -22,6 +21,19 @@ public class ColorUtil {
         }
         message = matcher.appendTail(builder).toString();
 
-        return ChatColor.translateAlternateColorCodes('&', message);
+        return translateAlternateColorCodes(message);
+    }
+
+    private static String translateAlternateColorCodes(String textToTranslate) {
+        char[] b = textToTranslate.toCharArray();
+
+        for(int i = 0; i < b.length - 1; ++i) {
+            if (b[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
+                b[i] = 167;
+                b[i + 1] = Character.toLowerCase(b[i + 1]);
+            }
+        }
+
+        return new String(b);
     }
 }
