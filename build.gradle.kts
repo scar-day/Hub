@@ -42,6 +42,12 @@ subprojects {
         }
     }
 
+    tasks.named("clean") {
+        doLast {
+            delete(file("${rootProject.projectDir}/compile"))
+        }
+    }
+
     tasks.withType<ProcessResources> {
         include("**/*.yml")
         include("**/*.prop")
