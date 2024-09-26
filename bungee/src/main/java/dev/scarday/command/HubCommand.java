@@ -1,11 +1,16 @@
 package dev.scarday.command;
 
 import dev.scarday.Main;
+import dev.scarday.multihub.Type;
 import lombok.val;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+
+import javax.annotation.Nullable;
+import java.util.Random;
 
 import static dev.scarday.util.ColorUtil.colorize;
 
@@ -26,34 +31,60 @@ public class HubCommand extends Command {
             return;
         }
 
-        val server = instance.getConfig()
-                .getServer();
+        val servers = instance.getConfig()
+                .getMultiHub()
+                .getServers();
 
-        val servers = instance.getProxy()
-                .getServersCopy()
-                .keySet();
+        if (servers.isEmpty()) {
+            val serversEmpty = instance.getConfig()
+                    .getMessages()
+                    .getListEmpty();
 
-        if (!servers.contains(server)) {
-            val noFound = instance.getConfig()
-                    .getMessages().getNoFoundServer();
-
-            commandSender.sendMessage(new TextComponent(colorize(noFound)));
+            commandSender.sendMessage(new TextComponent(colorize(serversEmpty)));
             return;
         }
 
-        val serverInfo = instance.getProxy()
-                .getServerInfo(server);
+        val type = instance.getConfig()
+                .getMultiHub()
+                .getType();
 
-        val connected = instance.getConfig()
-                .getMessages().getConnected();
+        if (type == Type.NONE) {
+            val serverName = servers.get(0);
 
-        if (player.getServer().getInfo() == serverInfo) {
-            commandSender.sendMessage(new TextComponent(colorize(connected)));
+            val serverInfo = instance.getProxy()
+                    .getServerInfo(serverName);
+
+            sendPlayerServer(player, serverInfo);
+        } else if (type == Type.RANDOM) {
+            val random = new Random();
+            val serverName = servers.get(random.nextInt(servers.size()));
+
+            val serverInfo = instance.getProxy()
+                    .getServerInfo(serverName);
+
+            sendPlayerServer(player, serverInfo);
+        } else if (type == Type.FILL) {
+            // 26.09.2024 написать по заполняемости.
+            return;
+        }
+    }
+
+    private void sendPlayerServer(ProxiedPlayer player, @Nullable ServerInfo server) {
+        if (server == null) {
+            player.sendMessage(new TextComponent(colorize(instance.getConfig()
+                    .getMessages()
+                    .getNoFoundServer())
+            ));
             return;
         }
 
-        player.sendMessage(new TextComponent(colorize(
-                instance.getConfig().getMessages().getConnect())));
-        player.connect(serverInfo);
+        if (instance.getConfig().getMessages().isSendMessage()) {
+            player.sendMessage(new TextComponent(colorize(instance.getConfig()
+                    .getMessages()
+                    .getConnect())
+            ));
+        }
+
+        player.connect(server);
     }
 }

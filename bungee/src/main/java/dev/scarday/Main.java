@@ -14,13 +14,10 @@ import java.io.File;
 @Getter
 
 public final class Main extends Plugin {
-    private Main instance;
-
     private Configuration config;
 
     @Override
     public void onEnable() {
-        instance = this;
         loadConfig();
 
         registerCommands();
