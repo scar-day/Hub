@@ -3,4 +3,5 @@
 
 > Для компиляции используйте shadowJar
 
-[ ] MultiHub support
+- [X] MultiHub support
+- [ ] Own command API
