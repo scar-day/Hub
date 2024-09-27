@@ -27,13 +27,12 @@ public class HubCommand extends Command {
 
     @Override
     public void execute(CommandSender commandSender, String[] args) {
-        if (!(commandSender instanceof ProxiedPlayer) &&
-            args.length == 0 || args[0].equalsIgnoreCase("reload")) {
-            instance.reloadConfig();
-            return;
-        }
-
         if (!(commandSender instanceof ProxiedPlayer player)) {
+            if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
+                instance.reloadConfig();
+                return;
+            }
+
             instance.getSLF4JLogger()
                     .info("Command is available only to the player!");
             return;
