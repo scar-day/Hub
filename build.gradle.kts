@@ -35,8 +35,7 @@ subprojects {
     tasks.withType<ShadowJar> {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-        val commitId = System.getenv("COMMITID");
-        val buildName = if (commitId != null) "Hub-${project.name}($commitId).jar" else "Hub-${project.name}-${rootProject.version}.jar"
+        val buildName = "Hub-${project.name}.jar"
 
         archiveFileName.set(buildName)
         destinationDirectory.set(file("${rootProject.projectDir}/compile"))
