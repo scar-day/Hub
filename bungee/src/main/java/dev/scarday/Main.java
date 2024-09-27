@@ -23,6 +23,9 @@ public final class Main extends Plugin {
         registerCommands();
     }
 
+    @Override
+    public void onDisable() {}
+
     public void loadConfig() {
         this.config = ConfigManager.create(Configuration.class, (it) -> {
             it.withConfigurer(new YamlBungeeConfigurer(), new SerdesBungee());
@@ -40,8 +43,7 @@ public final class Main extends Plugin {
         getSLF4JLogger().info("Command '{}' is success loaded!", command.getName());
     }
 
-    @Override
-    public void onDisable() {
+    public void reloadConfig() {
+        this.config = (Configuration) config.load();
     }
-
 }

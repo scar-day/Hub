@@ -26,7 +26,7 @@ public class HubCommand implements RawCommand {
 
     @Override
     public void execute(Invocation invocation) {
-        val source = invocation.source();
+/*        val source = invocation.source();
 
         if (!(source instanceof Player player)) {
             instance.getLogger().info("Command is available only to the player!");
@@ -72,7 +72,7 @@ public class HubCommand implements RawCommand {
             )));
         }
 
-        player.createConnectionRequest(server);
+        player.createConnectionRequest(server);*/
     }
 
 

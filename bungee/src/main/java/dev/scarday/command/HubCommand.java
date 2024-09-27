@@ -4,13 +4,15 @@ import dev.scarday.Main;
 import dev.scarday.multihub.Type;
 import lombok.val;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 import javax.annotation.Nullable;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static dev.scarday.util.ColorUtil.colorize;
 
@@ -24,7 +26,13 @@ public class HubCommand extends Command {
     }
 
     @Override
-    public void execute(CommandSender commandSender, String[] strings) {
+    public void execute(CommandSender commandSender, String[] args) {
+        if (!(commandSender instanceof ProxiedPlayer) &&
+            args.length == 0 || args[0].equalsIgnoreCase("reload")) {
+            instance.reloadConfig();
+            return;
+        }
+
         if (!(commandSender instanceof ProxiedPlayer player)) {
             instance.getSLF4JLogger()
                     .info("Command is available only to the player!");
@@ -56,7 +64,7 @@ public class HubCommand extends Command {
 
             sendPlayerServer(player, serverInfo);
         } else if (type == Type.RANDOM) {
-            val random = new Random();
+            val random = ThreadLocalRandom.current();
             val serverName = servers.get(random.nextInt(servers.size()));
 
             val serverInfo = instance.getProxy()
@@ -64,8 +72,14 @@ public class HubCommand extends Command {
 
             sendPlayerServer(player, serverInfo);
         } else if (type == Type.FILL) {
-            // 26.09.2024 написать по заполняемости.
-            return;
+            val multiServers = servers.stream()
+                    .map(server -> ProxyServer.getInstance().getServerInfo(server))
+                    .filter(Objects::nonNull)
+                    .toList();
+
+            multiServers.stream()
+                    .min(Comparator.comparing(server -> server.getPlayers().size()))
+                    .ifPresent(leastLoadedServers -> sendPlayerServer(player, leastLoadedServers));
         }
     }
 
@@ -78,7 +92,9 @@ public class HubCommand extends Command {
             return;
         }
 
-        if (instance.getConfig().getMessages().isSendMessage()) {
+        val isSendMessage = instance.getConfig().getMessages().isSendMessage();
+
+        if (isSendMessage) {
             player.sendMessage(new TextComponent(colorize(instance.getConfig()
                     .getMessages()
                     .getConnect())
