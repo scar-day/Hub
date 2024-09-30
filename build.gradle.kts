@@ -28,6 +28,9 @@ subprojects {
 
         implementation("eu.okaeri:okaeri-configs-core:5.0.5")
 
+        implementation("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
+        implementation("net.kyori:adventure-text-serializer-legacy:4.1.0-SNAPSHOT")
+
         compileOnly("org.projectlombok:lombok:1.18.34")
         annotationProcessor("org.projectlombok:lombok:1.18.34")
     }
@@ -35,11 +38,14 @@ subprojects {
     tasks.withType<ShadowJar> {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-        val commitId = System.getenv("COMMITID");
-        val buildName = if (commitId != null) "Hub-${project.name}($commitId).jar" else "Hub-${project.name}-${rootProject.version}.jar"
+        val buildName = "Hub-${project.name}(${rootProject.version}).jar"
 
         archiveFileName.set(buildName)
         destinationDirectory.set(file("${rootProject.projectDir}/compile"))
+
+        doFirst {
+            System.setProperty("file.encoding", "UTF-8")
+        }
 
         if (project.name == "common") {
             enabled = false

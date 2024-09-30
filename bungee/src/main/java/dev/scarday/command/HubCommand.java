@@ -32,8 +32,7 @@ public class HubCommand extends Command {
                 instance.reloadConfig();
                 return;
             }
-
-            instance.getSLF4JLogger()
+            instance.getLogger()
                     .info("Command is available only to the player!");
             return;
         }
@@ -84,20 +83,20 @@ public class HubCommand extends Command {
 
     private void sendPlayerServer(ProxiedPlayer player, @Nullable ServerInfo server) {
         if (server == null) {
-            player.sendMessage(new TextComponent(colorize(instance.getConfig()
+            player.sendMessage(new TextComponent(instance.getConfig()
                     .getMessages()
                     .getNoFoundServer())
-            ));
+            );
             return;
         }
 
         val isSendMessage = instance.getConfig().getMessages().isSendMessage();
 
         if (isSendMessage) {
-            player.sendMessage(new TextComponent(colorize(instance.getConfig()
+            player.sendMessage(new TextComponent(new TextComponent(colorize(instance.getConfig()
                     .getMessages()
-                    .getConnect())
-            ));
+                    .getConnect()
+            ))));
         }
 
         player.connect(server);

@@ -34,13 +34,14 @@ public final class Main extends Plugin {
             it.load(true);
         });
 
-        getSLF4JLogger().info("Configuration 'config.yml' is loaded!");
+        getLogger().info("Configuration 'config.yml' is loaded!");
     }
 
     public void registerCommands() {
         val command = new HubCommand(this);
         getProxy().getPluginManager().registerCommand(this, command);
-        getSLF4JLogger().info("Command '{}' is success loaded!", command.getName());
+
+        getLogger().info(String.format("Command '%s' is success loaded!", command.getName()));
     }
 
     public void reloadConfig() {
