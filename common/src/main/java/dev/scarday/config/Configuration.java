@@ -19,11 +19,11 @@ public class Configuration extends OkaeriConfig {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Messages extends OkaeriConfig {
         boolean sendMessage = true;
-        String connect = "&aПодключаю вас в хаб";
-        String connected = "&cВы итак в этом хабе!";
-        String noFoundServer = "&cПохоже что данного сервера нету в списке, сообщите администрации!";
+        String connect = "<green>Подключаю вас в хаб";
+        String connected = "<red>Вы итак в этом хабе!";
+        String noFoundServer = "<red>Похоже что данного сервера нету в списке, сообщите администрации!";
 
-        String listEmpty = "&cНе удалось найти нужный хаб, сообщите администрации!";
+        String listEmpty = "<red>Не удалось найти нужный хаб, сообщите администрации!";
     }
 
     MultiHub multiHub = new MultiHub();
@@ -35,9 +35,9 @@ public class Configuration extends OkaeriConfig {
 
         @Comment({
                 " ",
-                "NONE - по первому индексу",
-                "RANDOM - пробегаемся по списку",
-                "FILL - по заполняемости, если у сервера мало онлайна то, перекинет туда.",
+                "NONE - по первому индексу в листе",
+                "RANDOM - Рандомный сервер из списка",
+                "FILL - по заполняемости сервера, закинет на самый не заполненный сервер",
                 " "
         })
         Type type = Type.NONE;

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "dev.scarday"
-version = "2.1"
+version = "2.1-BETA"
 
 subprojects {
     apply(plugin = "java")

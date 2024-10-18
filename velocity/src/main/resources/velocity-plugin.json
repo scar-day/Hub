@@ -1,7 +1,0 @@
-{
-  "id": "@ID@",
-  "name": "@NAME@",
-  "version": "@VERSION@",
-  "authors": ["@AUTHOR@"],
-  "main": "dev.scarday.Main"
-}

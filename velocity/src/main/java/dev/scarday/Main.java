@@ -1,5 +1,6 @@
 package dev.scarday;
 
+import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import dev.scarday.command.HubCommand;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 @Getter
+@Plugin(id = "hub", name = "Hub", version = "2.1-BETA", authors = "ScarDay")
 public class Main {
     private final ProxyServer server;
     private final Logger logger;
