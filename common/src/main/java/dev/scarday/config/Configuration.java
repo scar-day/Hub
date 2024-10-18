@@ -31,7 +31,7 @@ public class Configuration extends OkaeriConfig {
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class MultiHub extends OkaeriConfig {
         @Comment("Список серверов куда будем закидывать игрока")
-        List<String> servers = Arrays.asList("lobby", "lobby2");
+        List<String> servers = List.of("lobby", "lobby2");
 
         @Comment({
                 " ",
