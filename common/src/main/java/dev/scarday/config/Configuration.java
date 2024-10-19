@@ -13,10 +13,10 @@ import java.util.List;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Configuration extends OkaeriConfig {
-    Messages messages = new Messages();
+    final Messages messages = new Messages();
 
     @Getter
-    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @FieldDefaults(level = AccessLevel.PACKAGE)
     public static class Messages extends OkaeriConfig {
         boolean sendMessage = true;
         String connect = "<green>Подключаю вас в хаб";
@@ -26,9 +26,9 @@ public class Configuration extends OkaeriConfig {
         String listEmpty = "<red>Не удалось найти нужный хаб, сообщите администрации!";
     }
 
-    MultiHub multiHub = new MultiHub();
+    final MultiHub multiHub = new MultiHub();
     @Getter
-    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @FieldDefaults(level = AccessLevel.PACKAGE)
     public static class MultiHub extends OkaeriConfig {
         @Comment("Список серверов куда будем закидывать игрока")
         List<String> servers = List.of("lobby", "lobby2");

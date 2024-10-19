@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("com.gradleup.shadow") version "8.3.1" apply false
+    id("net.kyori.indra.git") version "3.1.3"
 
     `java-library`
     java
@@ -13,6 +14,7 @@ version = "2.1-BETA"
 subprojects {
     apply(plugin = "java")
     apply(plugin = "com.gradleup.shadow")
+    apply(plugin = "net.kyori.indra.git")
 
     repositories {
         mavenCentral()
@@ -36,9 +38,15 @@ subprojects {
     }
 
     tasks.withType<ShadowJar> {
+        val commitId = indraGit.commit()!!.abbreviate(7).name();
+
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-        val buildName = "Hub-${project.name}(${rootProject.version}).jar"
+        val buildName: String = if (commitId != null) {
+            "${rootProject.name}-${project.name}-($commitId).jar"
+        } else {
+            "${rootProject.name}-${project.name}-${rootProject.version}.jar"
+        }
 
         archiveFileName.set(buildName)
         destinationDirectory.set(file("${rootProject.projectDir}/compile"))
