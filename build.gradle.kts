@@ -38,15 +38,11 @@ subprojects {
     }
 
     tasks.withType<ShadowJar> {
-        val commitId = indraGit.commit()!!.abbreviate(7).name();
+        val commitId = indraGit.commit()?.abbreviate(7)?.name() ?: "UNKNOWN"
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
-        val buildName: String = if (commitId != null) {
-            "${rootProject.name}-${project.name}-($commitId).jar"
-        } else {
-            "${rootProject.name}-${project.name}-${rootProject.version}.jar"
-        }
+        val buildName = "${rootProject.name}-${project.name}-($commitId).jar"
 
         archiveFileName.set(buildName)
         destinationDirectory.set(file("${rootProject.projectDir}/compile"))
