@@ -5,7 +5,6 @@ import com.velocitypowered.api.command.RawCommand;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import dev.scarday.Main;
-import dev.scarday.multihub.Type;
 import lombok.val;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -57,51 +56,56 @@ public class HubCommand implements RawCommand {
                 .getMultiHub()
                 .getType();
 
-        if (type == Type.NONE) {
-            val serverName = servers.get(0);
+        switch (type) {
+            case FILL -> {
+                val multiServers = servers.stream()
+                        .map(server -> instance.getServer().getServer(server))
+                        .flatMap(Optional::stream)
+                        .toList();
 
-            val serverInfo = instance.getServer().getServer(serverName);
-
-            if (serverInfo.isEmpty()) {
-                player.sendMessage(Component.text(instance.getConfig()
-                        .getMessages()
-                        .getNoFoundServer()));
-                return;
+                multiServers.stream()
+                        .min(Comparator.comparingInt(server -> server.getPlayersConnected().size()))
+                        .ifPresent(leastLoadedServer -> sendPlayerServer(player, leastLoadedServer));
             }
+            case RANDOM -> {
+                val random = ThreadLocalRandom.current();
+                val serverName = servers.get(random.nextInt(servers.size()));
 
-            sendPlayerServer(player, serverInfo.get());
-        } else if (type == Type.RANDOM) {
-            val random = ThreadLocalRandom.current();
-            val serverName = servers.get(random.nextInt(servers.size()));
+                val serverInfo = instance.getServer().getServer(serverName);
 
-            val serverInfo = instance.getServer().getServer(serverName);
+                if (serverInfo.isEmpty()) {
+                    player.sendMessage(Component.text(instance.getConfig()
+                            .getMessages()
+                            .getNoFoundServer()));
+                    return;
+                }
 
-            if (serverInfo.isEmpty()) {
-                player.sendMessage(Component.text(instance.getConfig()
-                        .getMessages()
-                        .getNoFoundServer()));
-                return;
+                sendPlayerServer(player, serverInfo.get());
             }
+            case NONE -> {
+                val serverName = servers.get(0);
 
-            sendPlayerServer(player, serverInfo.get());
-        } else if (type == Type.FILL) {
-            val multiServers = servers.stream()
-                    .map(server -> instance.getServer().getServer(server))
-                    .flatMap(Optional::stream)
-                    .toList();
+                val serverInfo = instance.getServer().getServer(serverName);
 
-            multiServers.stream()
-                    .min(Comparator.comparingInt(server -> server.getPlayersConnected().size()))
-                    .ifPresent(leastLoadedServer -> sendPlayerServer(player, leastLoadedServer));
+                if (serverInfo.isEmpty()) {
+                    player.sendMessage(Component.text(colorize(instance.getConfig()
+                            .getMessages()
+                            .getNoFoundServer())
+                    ));
+                    return;
+                }
+
+                sendPlayerServer(player, serverInfo.get());
+            }
         }
     }
 
     private void sendPlayerServer(Player player, @Nullable RegisteredServer server) {
         if (server == null) {
-            player.sendMessage(Component.text(instance.getConfig()
+            player.sendMessage(Component.text(colorize(instance.getConfig()
                     .getMessages()
-                    .getNoFoundServer())
-            );
+                    .getNoFoundServer()
+            )));
             return;
         }
 
@@ -116,7 +120,8 @@ public class HubCommand implements RawCommand {
             )));
         }
 
-        player.createConnectionRequest(server);
+        player.createConnectionRequest(server).fireAndForget();
     }
+
 
 }

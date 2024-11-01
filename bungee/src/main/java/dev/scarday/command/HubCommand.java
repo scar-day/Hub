@@ -93,10 +93,10 @@ public class HubCommand extends Command {
         val isSendMessage = instance.getConfig().getMessages().isSendMessage();
 
         if (isSendMessage) {
-            player.sendMessage(new TextComponent(new TextComponent(colorize(instance.getConfig()
+            player.sendMessage(new TextComponent(colorize(instance.getConfig()
                     .getMessages()
                     .getConnect()
-            ))));
+            )));
         }
 
         player.connect(server);

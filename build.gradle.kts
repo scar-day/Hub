@@ -30,8 +30,8 @@ subprojects {
 
         implementation("eu.okaeri:okaeri-configs-core:5.0.5")
 
-        implementation("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
-        implementation("net.kyori:adventure-text-serializer-legacy:4.1.0-SNAPSHOT")
+        implementation("net.kyori:adventure-text-minimessage:4.17.0")
+        implementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
 
         compileOnly("org.projectlombok:lombok:1.18.34")
         annotationProcessor("org.projectlombok:lombok:1.18.34")
