@@ -81,16 +81,7 @@ public class HubCommand extends Command {
                 () -> player.sendMessage(new TextComponent(colorize("<red>Не удалось найти сервер."))));
     }
 
-    private void sendPlayerServer(ProxiedPlayer player, @Nullable ServerInfo server) {
-        if (server == null) {
-            val notFound = instance.getConfig()
-                    .getMessages()
-                    .getNoFoundServer();
-
-            player.sendMessage(new TextComponent(notFound));
-            return;
-        }
-
+    private void sendPlayerServer(ProxiedPlayer player, ServerInfo server) {
         val isSendMessage = instance.getConfig().getMessages().isSendMessage();
 
         if (isSendMessage) {

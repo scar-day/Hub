@@ -7,6 +7,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import dev.scarday.Main;
 import lombok.val;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -91,16 +92,7 @@ public class HubCommand implements RawCommand {
                 () -> player.sendMessage(Component.text(colorize("<red>Не удалось найти сервер."))));
     }
 
-    private void sendPlayerServer(Player player, @Nullable RegisteredServer server) {
-        if (server == null) {
-            val noFound = instance.getConfig()
-                    .getMessages()
-                    .getNoFoundServer();
-
-            player.sendMessage(Component.text(colorize(noFound)));
-            return;
-        }
-
+    private void sendPlayerServer(Player player, @NotNull RegisteredServer server) {
         val isSendMessage = instance.getConfig()
                 .getMessages()
                 .isSendMessage();
