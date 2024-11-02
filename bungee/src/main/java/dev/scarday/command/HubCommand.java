@@ -8,7 +8,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -77,7 +76,8 @@ public class HubCommand extends Command {
             }
         }
 
-        serverInfo.ifPresentOrElse(server -> sendPlayerServer(player, server),
+        serverInfo.ifPresentOrElse(
+                server -> sendPlayerServer(player, server),
                 () -> player.sendMessage(new TextComponent(colorize("<red>Не удалось найти сервер."))));
     }
 

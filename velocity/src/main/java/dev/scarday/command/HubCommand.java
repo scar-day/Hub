@@ -8,7 +8,6 @@ import dev.scarday.Main;
 import lombok.val;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.Optional;

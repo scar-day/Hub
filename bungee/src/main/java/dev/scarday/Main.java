@@ -12,7 +12,6 @@ import net.md_5.bungee.api.plugin.Plugin;
 import java.io.File;
 
 @Getter
-
 public final class Main extends Plugin {
     private Configuration config;
 

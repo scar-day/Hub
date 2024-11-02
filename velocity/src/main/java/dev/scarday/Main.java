@@ -19,7 +19,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 @Getter
-@Plugin(id = "hub", name = "Hub", version = "2.1-BETA", authors = "ScarDay")
+@Plugin(id = "hub", name = "Hub", version = "2.2", authors = "ScarDay")
 public class Main {
     private final ProxyServer proxy;
     private final Logger logger;
