@@ -1,10 +1,8 @@
 package dev.scarday.command;
 
 import dev.scarday.Main;
-import dev.scarday.multihub.Type;
 import lombok.val;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -54,49 +52,52 @@ public class HubCommand extends Command {
                 .getMultiHub()
                 .getType();
 
-        if (type == Type.NONE) {
-            val serverName = servers.get(0);
+        val proxy = instance.getProxy();
 
-            val serverInfo = instance.getProxy()
-                    .getServerInfo(serverName);
+        Optional<ServerInfo> serverInfo = Optional.empty();
+        switch (type) {
+            case FILL -> {
+                val multiServers = servers.stream()
+                        .map(proxy::getServerInfo)
+                        .toList();
 
-            sendPlayerServer(player, serverInfo);
-        } else if (type == Type.RANDOM) {
-            val random = ThreadLocalRandom.current();
-            val serverName = servers.get(random.nextInt(servers.size()));
+                serverInfo = multiServers.stream()
+                        .min(Comparator.comparingInt(server -> server.getPlayers().size()));
+            }
+            case RANDOM -> {
+                val random = ThreadLocalRandom.current();
+                val serverName = servers.get(random.nextInt(servers.size()));
 
-            val serverInfo = instance.getProxy()
-                    .getServerInfo(serverName);
+                serverInfo = Optional.of(proxy.getServerInfo(serverName));
+            }
+            case NONE -> {
+                val serverName = servers.get(0);
 
-            sendPlayerServer(player, serverInfo);
-        } else if (type == Type.FILL) {
-            val multiServers = servers.stream()
-                    .map(server -> ProxyServer.getInstance().getServerInfo(server))
-                    .filter(Objects::nonNull)
-                    .toList();
-
-            multiServers.stream()
-                    .min(Comparator.comparing(server -> server.getPlayers().size()))
-                    .ifPresent(leastLoadedServers -> sendPlayerServer(player, leastLoadedServers));
+                serverInfo = Optional.of(proxy.getServerInfo(serverName));
+            }
         }
+
+        serverInfo.ifPresentOrElse(server -> sendPlayerServer(player, server),
+                () -> player.sendMessage(new TextComponent(colorize("<red>Не удалось найти сервер."))));
     }
 
     private void sendPlayerServer(ProxiedPlayer player, @Nullable ServerInfo server) {
         if (server == null) {
-            player.sendMessage(new TextComponent(instance.getConfig()
+            val notFound = instance.getConfig()
                     .getMessages()
-                    .getNoFoundServer())
-            );
+                    .getNoFoundServer();
+
+            player.sendMessage(new TextComponent(notFound));
             return;
         }
 
         val isSendMessage = instance.getConfig().getMessages().isSendMessage();
 
         if (isSendMessage) {
-            player.sendMessage(new TextComponent(colorize(instance.getConfig()
+            val message = instance.getConfig()
                     .getMessages()
-                    .getConnect()
-            )));
+                    .getConnect();
+            player.sendMessage(new TextComponent(colorize(message)));
         }
 
         player.connect(server);

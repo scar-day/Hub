@@ -21,7 +21,7 @@ import java.nio.file.Path;
 @Getter
 @Plugin(id = "hub", name = "Hub", version = "2.1-BETA", authors = "ScarDay")
 public class Main {
-    private final ProxyServer server;
+    private final ProxyServer proxy;
     private final Logger logger;
     @Getter
     private Configuration config;
@@ -30,7 +30,7 @@ public class Main {
 
     @Inject
     public Main(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
-        this.server = server;
+        this.proxy = server;
         this.logger = logger;
 
         this.dataDirectory = dataDirectory
@@ -44,7 +44,7 @@ public class Main {
     }
 
     private void registerCommands() {
-        val commandManager = server.getCommandManager();
+        val commandManager = getProxy().getCommandManager();
         val command = new HubCommand(this);
 
         commandManager.register(command.meta(), command);
@@ -66,5 +66,9 @@ public class Main {
         } catch (Exception exception) {
             getLogger().error("Error loading config.yml", exception);
         }
+    }
+
+    public void reloadConfig() {
+        this.config = (Configuration) config.load();
     }
 }

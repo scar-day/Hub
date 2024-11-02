@@ -22,7 +22,7 @@ public class HubCommand implements RawCommand {
     }
 
     public CommandMeta meta() {
-        val commandManager = instance.getServer().getCommandManager();
+        val commandManager = instance.getProxy().getCommandManager();
 
         return commandManager.metaBuilder("hub")
                 .aliases("lobby")
@@ -35,6 +35,11 @@ public class HubCommand implements RawCommand {
         val source = invocation.source();
 
         if (!(source instanceof Player player)) {
+            val args = invocation.arguments().split(" ");
+            if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
+                instance.reloadConfig();
+                return;
+            }
             instance.getLogger().info("Command is available only to the player!");
             return;
         }
@@ -56,56 +61,43 @@ public class HubCommand implements RawCommand {
                 .getMultiHub()
                 .getType();
 
+        val proxy = instance.getProxy();
+
+        Optional<RegisteredServer> serverInfo = Optional.empty();
         switch (type) {
             case FILL -> {
                 val multiServers = servers.stream()
-                        .map(server -> instance.getServer().getServer(server))
+                        .map(proxy::getServer)
                         .flatMap(Optional::stream)
                         .toList();
 
-                multiServers.stream()
-                        .min(Comparator.comparingInt(server -> server.getPlayersConnected().size()))
-                        .ifPresent(leastLoadedServer -> sendPlayerServer(player, leastLoadedServer));
+                serverInfo = multiServers.stream()
+                        .min(Comparator.comparingInt(server -> server.getPlayersConnected().size()));
             }
             case RANDOM -> {
                 val random = ThreadLocalRandom.current();
                 val serverName = servers.get(random.nextInt(servers.size()));
 
-                val serverInfo = instance.getServer().getServer(serverName);
-
-                if (serverInfo.isEmpty()) {
-                    player.sendMessage(Component.text(instance.getConfig()
-                            .getMessages()
-                            .getNoFoundServer()));
-                    return;
-                }
-
-                sendPlayerServer(player, serverInfo.get());
+                serverInfo = proxy.getServer(serverName);
             }
             case NONE -> {
                 val serverName = servers.get(0);
 
-                val serverInfo = instance.getServer().getServer(serverName);
-
-                if (serverInfo.isEmpty()) {
-                    player.sendMessage(Component.text(colorize(instance.getConfig()
-                            .getMessages()
-                            .getNoFoundServer())
-                    ));
-                    return;
-                }
-
-                sendPlayerServer(player, serverInfo.get());
+                serverInfo = proxy.getServer(serverName);
             }
         }
+
+        serverInfo.ifPresentOrElse(server -> sendPlayerServer(player, server),
+                () -> player.sendMessage(Component.text(colorize("<red>Не удалось найти сервер."))));
     }
 
     private void sendPlayerServer(Player player, @Nullable RegisteredServer server) {
         if (server == null) {
-            player.sendMessage(Component.text(colorize(instance.getConfig()
+            val noFound = instance.getConfig()
                     .getMessages()
-                    .getNoFoundServer()
-            )));
+                    .getNoFoundServer();
+
+            player.sendMessage(Component.text(colorize(noFound)));
             return;
         }
 
@@ -114,13 +106,14 @@ public class HubCommand implements RawCommand {
                 .isSendMessage();
 
         if (isSendMessage) {
-            player.sendMessage(Component.text(colorize(instance.getConfig()
+            val message = instance.getConfig()
                     .getMessages()
-                    .getConnect()
-            )));
+                    .getConnect();
+            player.sendMessage(Component.text(colorize(message)));
         }
 
-        player.createConnectionRequest(server).fireAndForget();
+        player.createConnectionRequest(server)
+                .fireAndForget();
     }
 
 
