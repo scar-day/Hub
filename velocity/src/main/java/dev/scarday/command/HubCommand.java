@@ -9,9 +9,12 @@ import lombok.val;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import static dev.scarday.util.ColorUtil.colorize;
 
@@ -34,15 +37,12 @@ public class HubCommand implements RawCommand {
     public void execute(Invocation invocation) {
         val source = invocation.source();
 
-        if (!(source instanceof Player player)) {
-            val args = invocation.arguments().split(" ");
-            if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-                instance.reloadConfig();
-                return;
-            }
+        if (!(source instanceof Player)) {
             instance.getLogger().info("Command is available only to the player!");
             return;
         }
+
+        val player = (Player) source;
 
         val servers = instance.getConfig()
                 .getMultiHub()
@@ -65,22 +65,23 @@ public class HubCommand implements RawCommand {
 
         Optional<RegisteredServer> serverInfo = Optional.empty();
         switch (type) {
-            case FILL -> {
+            case FILL: {
                 val multiServers = servers.stream()
                         .map(proxy::getServer)
-                        .flatMap(Optional::stream)
-                        .toList();
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toList());
 
                 serverInfo = multiServers.stream()
                         .min(Comparator.comparingInt(server -> server.getPlayersConnected().size()));
             }
-            case RANDOM -> {
+            case RANDOM: {
                 val random = ThreadLocalRandom.current();
                 val serverName = servers.get(random.nextInt(servers.size()));
 
                 serverInfo = proxy.getServer(serverName);
             }
-            case NONE -> {
+            case NONE: {
                 val serverName = servers.get(0);
 
                 serverInfo = proxy.getServer(serverName);

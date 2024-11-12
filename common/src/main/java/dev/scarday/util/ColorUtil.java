@@ -10,6 +10,7 @@ public class ColorUtil {
         val mm = MiniMessage.miniMessage();
         val deserialize = mm.deserialize(message);
 
-        return LegacyComponentSerializer.legacySection().serialize(deserialize);
+        return LegacyComponentSerializer.legacySection()
+                .serialize(deserialize);
     }
 }

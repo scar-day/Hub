@@ -10,6 +10,7 @@ import net.md_5.bungee.api.plugin.Command;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import static dev.scarday.util.ColorUtil.colorize;
 
@@ -24,7 +25,7 @@ public class HubCommand extends Command {
 
     @Override
     public void execute(CommandSender commandSender, String[] args) {
-        if (!(commandSender instanceof ProxiedPlayer player)) {
+        if (!(commandSender instanceof ProxiedPlayer)) {
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
                 instance.reloadConfig();
                 return;
@@ -55,26 +56,28 @@ public class HubCommand extends Command {
 
         Optional<ServerInfo> serverInfo = Optional.empty();
         switch (type) {
-            case FILL -> {
+            case FILL: {
                 val multiServers = servers.stream()
                         .map(proxy::getServerInfo)
-                        .toList();
+                        .collect(Collectors.toList());
 
                 serverInfo = multiServers.stream()
                         .min(Comparator.comparingInt(server -> server.getPlayers().size()));
             }
-            case RANDOM -> {
+            case RANDOM: {
                 val random = ThreadLocalRandom.current();
                 val serverName = servers.get(random.nextInt(servers.size()));
 
                 serverInfo = Optional.of(proxy.getServerInfo(serverName));
             }
-            case NONE -> {
+            case NONE: {
                 val serverName = servers.get(0);
 
                 serverInfo = Optional.of(proxy.getServerInfo(serverName));
             }
         }
+
+        val player = (ProxiedPlayer) commandSender;
 
         serverInfo.ifPresentOrElse(
                 server -> sendPlayerServer(player, server),
