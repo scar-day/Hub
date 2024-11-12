@@ -37,6 +37,11 @@ subprojects {
         annotationProcessor("org.projectlombok:lombok:1.18.34")
     }
 
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
     tasks.withType<ShadowJar> {
         val commitId = indraGit.commit()?.abbreviate(7)?.name() ?: "UNKNOWN"
 
