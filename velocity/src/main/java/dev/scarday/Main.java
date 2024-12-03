@@ -48,9 +48,6 @@ public class Main {
         val command = new HubCommand(this);
 
         commandManager.register(command.meta(), command);
-        logger.info("Command '{}' is success loaded!", command.meta().getAliases()
-                .toArray()[0]
-        );
     }
 
     private void initConfig() {

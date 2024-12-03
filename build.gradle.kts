@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.scarday"
-version = "2.2"
+version = "2.3"
 
 subprojects {
     apply(plugin = "java")
@@ -79,13 +79,5 @@ subprojects {
                 "AUTHOR" to "ScarDay"
             )
         )
-    }
-
-    if (project.name == "velocity") {
-        tasks.named<ProcessResources>("processResources") {
-            from(sourceSets["main"].resources.srcDirs) {
-                include("velocity-plugin.json")
-            }
-        }
     }
 }

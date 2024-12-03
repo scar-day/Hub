@@ -1,6 +1,10 @@
 package dev.scarday.command;
 
 import dev.scarday.Main;
+import dev.scarday.config.Configuration;
+import dev.scarday.util.ColorUtility;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.val;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -10,90 +14,134 @@ import net.md_5.bungee.api.plugin.Command;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
-import static dev.scarday.util.ColorUtil.colorize;
-
-public class HubCommand extends Command {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class HubCommand extends Command { // shitting in BaseComponent!!
     Main instance;
+    Configuration configuration;
 
     public HubCommand(Main instance) {
         super("hub", null, "лобби");
 
         this.instance = instance;
+        this.configuration = instance.getConfig();
     }
 
     @Override
     public void execute(CommandSender commandSender, String[] args) {
         if (!(commandSender instanceof ProxiedPlayer)) {
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
+
                 instance.reloadConfig();
+                val message = ColorUtility.colorize("<green>Successfully reloaded!");
+
+                commandSender.sendMessage(new TextComponent(ColorUtility.colorizeToString(message)));
                 return;
             }
+
             instance.getLogger()
                     .info("Command is available only to the player!");
             return;
         }
 
-        val servers = instance.getConfig()
-                .getMultiHub()
+        val player = (ProxiedPlayer) commandSender;
+
+        val servers = configuration.getMultiHub()
                 .getServers();
 
         if (servers.isEmpty()) {
-            val serversEmpty = instance.getConfig()
-                    .getMessages()
+            val serversEmpty = configuration.getMessages()
                     .getListEmpty();
 
-            commandSender.sendMessage(new TextComponent(colorize(serversEmpty)));
+            title(player, configuration.getTitle().getError());
+
+            val message = ColorUtility.colorize(serversEmpty);
+
+            player.sendMessage(new TextComponent(ColorUtility.colorizeToString(message)));
             return;
         }
-
-        val type = instance.getConfig()
-                .getMultiHub()
-                .getType();
 
         val proxy = instance.getProxy();
 
         Optional<ServerInfo> serverInfo = Optional.empty();
-        switch (type) {
-            case FILL: {
-                val multiServers = servers.stream()
-                        .map(proxy::getServerInfo)
-                        .collect(Collectors.toList());
 
-                serverInfo = multiServers.stream()
-                        .min(Comparator.comparingInt(server -> server.getPlayers().size()));
+        try {
+            switch (configuration.getMultiHub().getType()) {
+                case FILL: {
+                    serverInfo = servers.stream()
+                            .map(proxy::getServerInfo)
+                            .filter(Objects::nonNull)
+                            .min(Comparator.comparingInt(server -> server.getPlayers().size()));
+                    break;
+                }
+                case RANDOM: {
+                    val random = ThreadLocalRandom.current();
+                    val serverName = servers.get(random.nextInt(servers.size()));
+                    serverInfo = Optional.ofNullable(proxy.getServerInfo(serverName));
+                    break;
+                }
+                case NONE: {
+                    val serverName = servers.get(0);
+                    serverInfo = Optional.ofNullable(proxy.getServerInfo(serverName));
+                    break;
+                }
             }
-            case RANDOM: {
-                val random = ThreadLocalRandom.current();
-                val serverName = servers.get(random.nextInt(servers.size()));
-
-                serverInfo = Optional.of(proxy.getServerInfo(serverName));
-            }
-            case NONE: {
-                val serverName = servers.get(0);
-
-                serverInfo = Optional.of(proxy.getServerInfo(serverName));
-            }
+        } catch (Exception e) {
+            title(player, configuration.getTitle().getError());
+            val message = ColorUtility.colorize(configuration.getMessages().getNoFoundServer());
+            player.sendMessage(new TextComponent(ColorUtility.colorizeToString(message)));
         }
-
-        val player = (ProxiedPlayer) commandSender;
 
         serverInfo.ifPresentOrElse(
                 server -> sendPlayerServer(player, server),
-                () -> player.sendMessage(new TextComponent(colorize("<red>Не удалось найти сервер."))));
+                () -> {
+                    val componentMessage = ColorUtility.colorize("<red>Не удалось найти нужный вам сервер.");
+
+                    player.sendMessage(new TextComponent(ColorUtility.colorizeToString(componentMessage)));
+                });
     }
 
     private void sendPlayerServer(ProxiedPlayer player, ServerInfo server) {
-        val isSendMessage = instance.getConfig().getMessages().isSendMessage();
+        val isSendMessage = configuration.getMessages().isSendMessage();
+
+        if (player.getServer().getInfo() == server) {
+            title(player, configuration.getTitle().getConnected());
+
+            val message = configuration.getMessages()
+                    .getConnected();
+
+            val componentMessage = ColorUtility.colorize(message);
+
+            player.sendMessage(new TextComponent(ColorUtility.colorizeToString(componentMessage)));
+            return;
+        }
 
         if (isSendMessage) {
-            val message = instance.getConfig()
-                    .getMessages()
+            val message = configuration.getMessages()
                     .getConnect();
-            player.sendMessage(new TextComponent(colorize(message)));
+
+            val componentMessage = ColorUtility.colorize(message);
+
+            title(player, configuration.getTitle().getConnect());
+            player.sendMessage(new TextComponent(ColorUtility.colorizeToString(componentMessage)));
         }
 
         player.connect(server);
+    }
+
+    private void title(ProxiedPlayer player, String text) {
+        val titleInstance = instance.getProxy().createTitle();
+        val split = text.split(";");
+
+        val title = split[0].isEmpty() ? "" : split[0];
+        val subtitle = split.length > 1 ? split[1] : "";
+
+        val titleComponent = ColorUtility.colorize(title);
+        val subtitleComponent = ColorUtility.colorize(subtitle);
+
+        titleInstance
+                .title(new TextComponent(ColorUtility.colorizeToString(titleComponent)))
+                .subTitle(new TextComponent(ColorUtility.colorizeToString(subtitleComponent)))
+                .send(player);
     }
 }

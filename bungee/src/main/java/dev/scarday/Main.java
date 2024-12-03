@@ -18,7 +18,6 @@ public final class Main extends Plugin {
     @Override
     public void onEnable() {
         loadConfig();
-
         registerCommands();
     }
 
@@ -39,8 +38,6 @@ public final class Main extends Plugin {
     public void registerCommands() {
         val command = new HubCommand(this);
         getProxy().getPluginManager().registerCommand(this, command);
-
-        getLogger().info(String.format("Command '%s' is success loaded!", command.getName()));
     }
 
     public void reloadConfig() {
