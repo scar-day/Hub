@@ -31,7 +31,6 @@ subprojects {
         implementation("eu.okaeri:okaeri-configs-core:5.0.5")
 
         implementation("net.kyori:adventure-text-minimessage:4.17.0")
-        implementation("net.kyori:adventure-text-serializer-legacy:4.17.0")
 
         compileOnly("org.projectlombok:lombok:1.18.34")
         annotationProcessor("org.projectlombok:lombok:1.18.34")
@@ -43,28 +42,7 @@ subprojects {
     }
 
     tasks.withType<ShadowJar> {
-        val commitId = indraGit.commit()?.abbreviate(7)?.name() ?: "UNKNOWN"
-
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-        val buildName = "${rootProject.name}-${project.name}-($commitId).jar"
-
-        archiveFileName.set(buildName)
-        destinationDirectory.set(file("${rootProject.projectDir}/compile"))
-
-        doFirst {
-            System.setProperty("file.encoding", "UTF-8")
-        }
-
-        if (project.name == "common") {
-            enabled = false
-        }
-    }
-
-    tasks.named("clean") {
-        doLast {
-            delete(file("${rootProject.projectDir}/compile"))
-        }
+        relocate("net.kyori", "dev.scarday.libs")
     }
 
     tasks.withType<ProcessResources> {

@@ -3,14 +3,20 @@ package dev.scarday.command;
 import dev.scarday.Main;
 import dev.scarday.config.Configuration;
 import dev.scarday.util.ColorUtility;
+import eu.okaeri.platform.core.i18n.message.Audience;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
+import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,12 +25,14 @@ import java.util.concurrent.ThreadLocalRandom;
 public class HubCommand extends Command { // shitting in BaseComponent!!
     Main instance;
     Configuration configuration;
+    BungeeAudiences audience;
 
     public HubCommand(Main instance) {
         super("hub", null, "лобби");
 
         this.instance = instance;
         this.configuration = instance.getConfig();
+        this.audience = instance.getAdventure();
     }
 
     @Override
@@ -35,7 +43,7 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
                 instance.reloadConfig();
                 val message = ColorUtility.colorize("<green>Successfully reloaded!");
 
-                commandSender.sendMessage(new TextComponent(ColorUtility.colorizeToString(message)));
+                commandSender.sendMessage(colorizeToString(message));
                 return;
             }
 
@@ -57,7 +65,8 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
 
             val message = ColorUtility.colorize(serversEmpty);
 
-            player.sendMessage(new TextComponent(ColorUtility.colorizeToString(message)));
+            audience.player(player)
+                    .sendMessage(message);
             return;
         }
 
@@ -89,7 +98,8 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
         } catch (Exception e) {
             title(player, configuration.getTitle().getError());
             val message = ColorUtility.colorize(configuration.getMessages().getNoFoundServer());
-            player.sendMessage(new TextComponent(ColorUtility.colorizeToString(message)));
+            audience.player(player)
+                    .sendMessage(message);
         }
 
         serverInfo.ifPresentOrElse(
@@ -97,7 +107,8 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
                 () -> {
                     val componentMessage = ColorUtility.colorize("<red>Не удалось найти нужный вам сервер.");
 
-                    player.sendMessage(new TextComponent(ColorUtility.colorizeToString(componentMessage)));
+                    audience.player(player)
+                            .sendMessage(componentMessage);;
                 });
     }
 
@@ -112,7 +123,8 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
 
             val componentMessage = ColorUtility.colorize(message);
 
-            player.sendMessage(new TextComponent(ColorUtility.colorizeToString(componentMessage)));
+            audience.player(player)
+                    .sendMessage(componentMessage);
             return;
         }
 
@@ -123,7 +135,8 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
             val componentMessage = ColorUtility.colorize(message);
 
             title(player, configuration.getTitle().getConnect());
-            player.sendMessage(new TextComponent(ColorUtility.colorizeToString(componentMessage)));
+            audience.player(player)
+                    .sendMessage(componentMessage);
         }
 
         player.connect(server);
@@ -140,8 +153,12 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
         val subtitleComponent = ColorUtility.colorize(subtitle);
 
         titleInstance
-                .title(new TextComponent(ColorUtility.colorizeToString(titleComponent)))
-                .subTitle(new TextComponent(ColorUtility.colorizeToString(subtitleComponent)))
+                .title(new TextComponent(colorizeToString(titleComponent)))
+                .subTitle(new TextComponent(colorizeToString(subtitleComponent)))
                 .send(player);
+    }
+
+    public String colorizeToString(@NotNull Component message) {
+        return LegacyComponentSerializer.legacySection().serialize(message);
     }
 }

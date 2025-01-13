@@ -6,8 +6,9 @@ dependencies {
     implementation(project(":common"))
 
     implementation("eu.okaeri:okaeri-platform-bungee:0.4.39")
+    implementation("net.kyori:adventure-platform-bungeecord:4.3.4")
 
-    compileOnly("io.github.waterfallmc:waterfall-api:1.20-R0.1-SNAPSHOT")
+    compileOnly("net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT")
 }
 
 bungee {
