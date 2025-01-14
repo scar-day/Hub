@@ -3,20 +3,16 @@ package dev.scarday.command;
 import dev.scarday.Main;
 import dev.scarday.config.Configuration;
 import dev.scarday.util.ColorUtility;
-import eu.okaeri.platform.core.i18n.message.Audience;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.title.Title;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -39,11 +35,11 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
     public void execute(CommandSender commandSender, String[] args) {
         if (!(commandSender instanceof ProxiedPlayer)) {
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-
                 instance.reloadConfig();
                 val message = ColorUtility.colorize("<green>Successfully reloaded!");
 
-                commandSender.sendMessage(colorizeToString(message));
+                instance.getLogger()
+                        .info(LegacyComponentSerializer.legacyAmpersand().serialize(message));
                 return;
             }
 
@@ -143,7 +139,6 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
     }
 
     private void title(ProxiedPlayer player, String text) {
-        val titleInstance = instance.getProxy().createTitle();
         val split = text.split(";");
 
         val title = split[0].isEmpty() ? "" : split[0];
@@ -152,13 +147,9 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
         val titleComponent = ColorUtility.colorize(title);
         val subtitleComponent = ColorUtility.colorize(subtitle);
 
-        titleInstance
-                .title(new TextComponent(colorizeToString(titleComponent)))
-                .subTitle(new TextComponent(colorizeToString(subtitleComponent)))
-                .send(player);
-    }
+        val titleAdventure = Title.title(titleComponent, subtitleComponent);
 
-    public String colorizeToString(@NotNull Component message) {
-        return LegacyComponentSerializer.legacySection().serialize(message);
+        audience.player(player)
+                .showTitle(titleAdventure);
     }
 }
