@@ -45,7 +45,7 @@ subprojects {
         relocate("net.kyori", "dev.scarday.libs")
         relocate("eu.okaeri", "dev.scarday.libs")
 
-        archiveFileName = "Hub-${rootProject.version}.jar"
+        archiveFileName = "Hub-${rootProject.version}(${firstLetterUpperCase(project.name)}).jar"
     }
 
     sourceSets.main {
@@ -59,4 +59,12 @@ subprojects {
             it.outputs.files
         })
     } //taken from LimboAuth Social Addon
+}
+
+fun firstLetterUpperCase(text: String): String {
+    if (text.isNotEmpty()) {
+        return text[0].uppercase() + text.substring(1, text.length)
+    }
+
+    return text
 }
