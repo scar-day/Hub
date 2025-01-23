@@ -1,4 +1,3 @@
 rootProject.name = "Hub"
 
-include("bungee", "velocity")
-include("common")
+include("bungee", "velocity", "common")

@@ -10,6 +10,7 @@ import eu.okaeri.configs.serdes.adventure.SerdesAdventure;
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer;
 import lombok.Getter;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import javax.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
@@ -18,15 +19,15 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import java.io.File;
 import java.nio.file.Path;
 
+@Plugin(id = "hub", name = "Hub", version = BuildConstant.VERSION, authors = "ScarDay")
 @Getter
-@Plugin(id = "hub", name = "Hub", version = "2.2", authors = "ScarDay")
 public class Main {
-    private final ProxyServer proxy;
-    private final Logger logger;
-    @Getter
-    private Configuration config;
+    final ProxyServer proxy;
+    final Logger logger;
+    File dataDirectory;
 
-    private final File dataDirectory;
+    @NotNull
+    Configuration config = new Configuration();
 
     @Inject
     public Main(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -68,4 +69,5 @@ public class Main {
     public void reloadConfig() {
         this.config = (Configuration) config.load();
     }
+
 }

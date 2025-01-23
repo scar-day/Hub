@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.val;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import net.md_5.bungee.api.CommandSender;
@@ -18,7 +19,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HubCommand extends Command { // shitting in BaseComponent!!
+public class HubCommand extends Command {
     Main instance;
     Configuration configuration;
     BungeeAudiences audience;
@@ -61,8 +62,7 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
 
             val message = ColorUtility.colorize(serversEmpty);
 
-            audience.player(player)
-                    .sendMessage(message);
+            sendMessage(player, message);
             return;
         }
 
@@ -70,42 +70,30 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
 
         Optional<ServerInfo> serverInfo = Optional.empty();
 
-        try {
-            switch (configuration.getMultiHub().getType()) {
-                case FILL: {
-                    serverInfo = servers.stream()
-                            .map(proxy::getServerInfo)
-                            .filter(Objects::nonNull)
-                            .min(Comparator.comparingInt(server -> server.getPlayers().size()));
-                    break;
-                }
-                case RANDOM: {
-                    val random = ThreadLocalRandom.current();
-                    val serverName = servers.get(random.nextInt(servers.size()));
-                    serverInfo = Optional.ofNullable(proxy.getServerInfo(serverName));
-                    break;
-                }
-                case NONE: {
-                    val serverName = servers.get(0);
-                    serverInfo = Optional.ofNullable(proxy.getServerInfo(serverName));
-                    break;
-                }
+        switch (configuration.getMultiHub().getType()) {
+            case FILL: {
+                serverInfo = servers.stream()
+                        .map(proxy::getServerInfo)
+                        .filter(Objects::nonNull)
+                        .min(Comparator.comparingInt(server -> server.getPlayers().size()));
+                break;
             }
-        } catch (Exception e) {
-            title(player, configuration.getTitle().getError());
-            val message = ColorUtility.colorize(configuration.getMessages().getNoFoundServer());
-            audience.player(player)
-                    .sendMessage(message);
+            case RANDOM: {
+                val random = ThreadLocalRandom.current();
+                val serverName = servers.get(random.nextInt(servers.size()));
+                serverInfo = Optional.ofNullable(proxy.getServerInfo(serverName));
+                break;
+            }
+            case NONE: {
+                val serverName = servers.get(0);
+                serverInfo = Optional.ofNullable(proxy.getServerInfo(serverName));
+                break;
+            }
         }
 
         serverInfo.ifPresentOrElse(
                 server -> sendPlayerServer(player, server),
-                () -> {
-                    val componentMessage = ColorUtility.colorize("<red>Не удалось найти нужный вам сервер.");
-
-                    audience.player(player)
-                            .sendMessage(componentMessage);;
-                });
+                () -> sendMessage(player, ColorUtility.colorize("<red>Не удалось найти нужный вам сервер.")));
     }
 
     private void sendPlayerServer(ProxiedPlayer player, ServerInfo server) {
@@ -119,8 +107,7 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
 
             val componentMessage = ColorUtility.colorize(message);
 
-            audience.player(player)
-                    .sendMessage(componentMessage);
+            sendMessage(player, componentMessage);
             return;
         }
 
@@ -131,8 +118,8 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
             val componentMessage = ColorUtility.colorize(message);
 
             title(player, configuration.getTitle().getConnect());
-            audience.player(player)
-                    .sendMessage(componentMessage);
+
+            sendMessage(player, componentMessage);
         }
 
         player.connect(server);
@@ -151,5 +138,10 @@ public class HubCommand extends Command { // shitting in BaseComponent!!
 
         audience.player(player)
                 .showTitle(titleAdventure);
+    }
+
+    private void sendMessage(ProxiedPlayer player, Component message) {
+        audience.player(player)
+                .sendMessage(message);
     }
 }

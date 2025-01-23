@@ -43,19 +43,20 @@ subprojects {
 
     tasks.withType<ShadowJar> {
         relocate("net.kyori", "dev.scarday.libs")
+        relocate("eu.okaeri", "dev.scarday.libs")
+
+        archiveFileName = "Hub-${rootProject.version}.jar"
     }
 
-    tasks.withType<ProcessResources> {
-        include("**/*.yml")
-        include("**/*.prop")
-        include("**/*.zip")
-        filter<org.apache.tools.ant.filters.ReplaceTokens>(
-            "tokens" to mapOf(
-                "ID" to rootProject.name.lowercase(),
-                "NAME" to rootProject.name,
-                "VERSION" to rootProject.version,
-                "AUTHOR" to "ScarDay"
-            )
-        )
-    }
+    sourceSets.main {
+        java.srcDir(tasks.register<Copy>("generateTemplates") {
+            inputs.property("version", rootProject.version)
+
+            from("src/main/templates")
+            into(layout.buildDirectory.dir("generated/sources/templates"))
+            expand(mapOf("version" to rootProject.version))
+        }.map {
+            it.outputs.files
+        })
+    } //taken from LimboAuth Social Addon
 }

@@ -14,6 +14,6 @@ dependencies {
 bungee {
     main = "dev.scarday.Main"
     name = "Hub"
-    version = "2.1-BETA"
+    version = rootProject.version.toString()
     author = "ScarDay"
 }
