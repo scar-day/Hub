@@ -37,10 +37,10 @@ public class HubCommand extends Command {
         if (!(commandSender instanceof ProxiedPlayer)) {
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
                 instance.reloadConfig();
-                val message = ColorUtility.colorize("<green>Successfully reloaded!");
+                val message = ColorUtility.colorize("<green>Successfully reloaded config!");
 
                 instance.getLogger()
-                        .info(LegacyComponentSerializer.legacyAmpersand().serialize(message));
+                        .info(LegacyComponentSerializer.legacySection().serialize(message));
                 return;
             }
 
