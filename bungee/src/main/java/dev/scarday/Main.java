@@ -43,8 +43,6 @@ public class Main extends Plugin {
             it.saveDefaults();
             it.load(true);
         });
-
-        getLogger().info("Configuration 'config.yml' is loaded!");
     }
 
     private void registerCommands() {

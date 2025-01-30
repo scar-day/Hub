@@ -29,7 +29,7 @@ public class Configuration extends OkaeriConfig {
     Title title = new Title();
 
     @Getter
-    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @FieldDefaults(level = AccessLevel.PACKAGE)
     public static class Title extends OkaeriConfig {
         @Comments(value = @Comment(value = "до ; это title, после subtitle"))
         String connect = "<green>Подключаю вас!;<white>Ожидайте.";
