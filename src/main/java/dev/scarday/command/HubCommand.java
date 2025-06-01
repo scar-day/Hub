@@ -8,7 +8,6 @@ import dev.scarday.Main;
 import dev.scarday.config.Configuration;
 import dev.scarday.util.ColorUtility;
 import lombok.val;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 
@@ -104,6 +103,6 @@ public class HubCommand implements RawCommand {
         val title = split[0].isEmpty() ? "" : split[0];
         val subtitle = split.length > 1 ? split[1] : "";
 
-        player.showTitle(Title.title(Component.text(title), Component.text(subtitle)));
+        player.showTitle(Title.title(ColorUtility.colorize(title), ColorUtility.colorize(subtitle)));
     }
 }
