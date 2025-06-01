@@ -1,6 +1,6 @@
 package dev.scarday.config;
 
-import dev.scarday.multihub.Type;
+import dev.scarday.hub.type.Type;
 import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.annotation.Comment;
 import eu.okaeri.configs.annotation.Comments;
