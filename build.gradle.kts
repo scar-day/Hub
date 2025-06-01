@@ -1,70 +1,45 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
-    id("com.gradleup.shadow") version "8.3.1" apply false
-    id("net.kyori.indra.git") version "3.1.3"
+    id("java")
 
-    `java-library`
-    java
+    id("com.gradleup.shadow") version "8.3.1"
 }
 
 group = "dev.scarday"
-version = "2.4"
+version = "1.0"
 
-subprojects {
-    apply(plugin = "java")
-    apply(plugin = "com.gradleup.shadow")
-    apply(plugin = "net.kyori.indra.git")
+repositories {
+    mavenCentral()
 
-    repositories {
-        mavenCentral()
-
-        maven { url = uri("https://repo.velocitypowered.com/snapshots/") }
-        maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
-        maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
-        maven { url = uri("https://storehouse.okaeri.eu/repository/maven-public/") }
-    }
-
-    dependencies {
-        compileOnly("org.jetbrains:annotations:24.1.0")
-
-        implementation("eu.okaeri:okaeri-configs-core:5.0.5")
-
-        implementation("net.kyori:adventure-text-minimessage:4.17.0")
-
-        compileOnly("org.projectlombok:lombok:1.18.34")
-        annotationProcessor("org.projectlombok:lombok:1.18.34")
-    }
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    tasks.withType<ShadowJar> {
-        relocate("net.kyori", "dev.scarday.libs")
-        relocate("eu.okaeri", "dev.scarday.libs")
-
-        archiveFileName = "Hub-${rootProject.version}(${firstLetterUpperCase(project.name)}).jar"
-    }
-
-    sourceSets.main {
-        java.srcDir(tasks.register<Copy>("generateTemplates") {
-            inputs.property("version", rootProject.version)
-
-            from("src/main/templates")
-            into(layout.buildDirectory.dir("generated/sources/templates"))
-            expand(mapOf("version" to rootProject.version))
-        }.map {
-            it.outputs.files
-        })
-    } //taken from LimboAuth Social Addon
+    maven("https://repo.velocitypowered.com/snapshots/")
+    maven("https://oss.sonatype.org/content/groups/public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://storehouse.okaeri.eu/repository/maven-public/")
 }
 
-fun firstLetterUpperCase(text: String): String {
-    if (text.isNotEmpty()) {
-        return text[0].uppercase() + text.substring(1, text.length)
-    }
+dependencies {
+    compileOnly("org.jetbrains:annotations:24.1.0")
 
-    return text
+    compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
+
+    implementation("eu.okaeri:okaeri-configs-core:5.0.5")
+    implementation("eu.okaeri:okaeri-platform-velocity:0.4.39")
+
+    implementation("net.kyori:adventure-text-minimessage:4.17.0")
+
+    compileOnly("org.projectlombok:lombok:1.18.34")
+    annotationProcessor("org.projectlombok:lombok:1.18.34")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.shadowJar {
+    archiveBaseName.set(rootProject.name)
+    archiveClassifier.set("")
+
+    relocate("net.kyori", "dev.scarday.libs")
+    relocate("eu.okaeri", "dev.scarday.libs")
 }

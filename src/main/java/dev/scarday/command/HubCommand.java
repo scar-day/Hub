@@ -12,10 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public class HubCommand implements RawCommand {
     Main instance;
@@ -39,7 +36,7 @@ public class HubCommand implements RawCommand {
     public void execute(Invocation invocation) {
         val source = invocation.source();
 
-        if (!(source instanceof Player)) {
+        if (!(source instanceof Player player)) {
             val args = invocation.arguments().split(" ");
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
                 instance.reloadConfig();
@@ -51,8 +48,6 @@ public class HubCommand implements RawCommand {
             return;
         }
 
-        val player = (Player) source;
-
         val servers = configuration.getMultiHub()
                 .getServers();
 
@@ -60,7 +55,7 @@ public class HubCommand implements RawCommand {
             val serversEmpty = configuration.getMessages()
                     .getListEmpty();
 
-            title(player, configuration.getTitle().getError());
+            sendTitle(player, configuration.getTitle().getError());
 
             player.sendMessage(ColorUtility.colorize(serversEmpty));
             return;
@@ -69,32 +64,7 @@ public class HubCommand implements RawCommand {
         val type = configuration.getMultiHub()
                 .getType();
 
-        val proxy = instance.getProxy();
-
-        Optional<RegisteredServer> serverInfo = Optional.empty();
-        switch (type) {
-            case FILL: {
-                val multiServers = servers.stream()
-                        .map(proxy::getServer)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toList());
-
-                serverInfo = multiServers.stream()
-                        .min(Comparator.comparingInt(server -> server.getPlayersConnected().size()));
-            }
-            case RANDOM: {
-                val random = ThreadLocalRandom.current();
-                val serverName = servers.get(random.nextInt(servers.size()));
-
-                serverInfo = proxy.getServer(serverName);
-            }
-            case NONE: {
-                val serverName = servers.get(0);
-
-                serverInfo = proxy.getServer(serverName);
-            }
-        }
+        Optional<RegisteredServer> serverInfo = instance.getServerFactory().getServer(servers, type);
 
         serverInfo.ifPresentOrElse(server -> sendPlayerServer(player, server),
                 () -> player.sendMessage(ColorUtility.colorize("<red>Не удалось найти нужный вам сервер.")));
@@ -109,7 +79,7 @@ public class HubCommand implements RawCommand {
             val registeredServer = currentServer.getServer();
 
             if (registeredServer == server) {
-                title(player, configuration.getTitle().getConnected());
+                sendTitle(player, configuration.getTitle().getConnected());
 
                 player.sendMessage(ColorUtility.colorize(configuration.getMessages().getConnected()));
                 return;
@@ -117,7 +87,7 @@ public class HubCommand implements RawCommand {
         }
 
         if (isSendMessage) {
-            title(player, configuration.getTitle().getConnect());
+            sendTitle(player, configuration.getTitle().getConnect());
             val message = configuration.getMessages()
                     .getConnect();
 
@@ -128,7 +98,7 @@ public class HubCommand implements RawCommand {
                 .fireAndForget();
     }
 
-    private void title(Player player, String text) {
+    private void sendTitle(Player player, String text) {
         val split = text.split(";");
 
         val title = split[0].isEmpty() ? "" : split[0];
